@@ -45,7 +45,7 @@ def start():
     headType = "pixel"
     tailType = "hook"
 
-    return start_response(color)
+    return start_response(color),start_response(headType),start_response(tailType)
 
 
 @bottle.post('/move')
@@ -60,60 +60,85 @@ def move():
     x = [2]
     y = [2] 
     length = 1
-    move = 0
-    for i in range(0,7):
-            x.append(0)
-            y.append(0)
     directions = ['up', 'down', 'left', 'right']
-    direction = random.choice([directions])
+    move = 'down'
     # head update
-    move +=1
-    if move >5:
-        for i in range(length-1,0,-1):
-                    x[i] = x[i-1]
-                    y[i] = y[i-1]
-    
-    if direction == 'right':
+    if move == 'right':
+        x.append(x[0])
+        y.append(y[0])
         x[0] +=1
-    elif direction == 'left':
+    elif move == 'left':
+        x.append(x[0])
+        y.append(y[0])
         x[0] -=1
-    elif direction == 'up':
-        y[0] +=1
-    elif direction == 'down':
+    elif move == 'up':
+        y.append(y[0])
+        x.append(x[0])
         y[0] -=1
+    elif move == 'down':
+        y.append(y[0])
+        x.append(x[0])
+        y[0] +=1
 
-    if x[0] == 1:
-            if (y[0] == 1):
-                direction = 'down'
-            elif (y[0] == 7):
-                direction = 'up'
-            elif (y[0] != y[1]):
-                direction = 'left'
+    if (y[0]==y[1]):
+        if x[0] == x[len(x)-1]+1 or x[0] == x[len(x)-1]-1:
+            if y[(len(x)-1)//2] > y[0]:
+                move = 'up'
+            else: 
+                move ='down'
+
+    elif (x[0]==x[1]):
+        if y[0] == y[len(x)-1]+1 or y[0] == y[len(x)-1]-1:
+            if x[(len(x)-1)//2] > x[0]:
+                move = 'left'
             else:
-                direction = random.choice(['up','down'])
-            
-    if x[0] == 7:
+                move = 'right'
+    
+
+    elif x[0] == 1:
+        if (y[0] == 1 and x[0]==x[1]):
+            move ='left'
         if (y[0] == 1):
-            direction = 'down'
+            move = 'down'
         elif (y[0] == 7):
-            direction = 'up'
+            move = 'up'
         elif (y[0] != y[1]):
-            direction = 'right'
+            move = 'left'
         else:
-            direction = random.choice(['up','down'])
+            move = random.choice(['up','down'])
+ 
+    
+    elif x[0] == 7:
+        if (y[0] == 1 and x[0]==x[1]):
+            move ='right'
+        if (y[0] == 1):
+            move = 'down'
+        elif (y[0] == 7):
+            move = 'up'
+        elif (y[0] != y[1]):
+            move = 'right'
+        else:
+            move = random.choice(['up','down'])
 
-    if y[0] == 1:
+    elif y[0] == 1:
         if (x[0] != x[1]):
-            direction = 'down'
+            move = 'down'
         else:
-            direction = random.choice(['left','right'])
-    if y[0] == 7:
-        if (x[0] != x[1]):
-            direction = 'up'
-        else:
-            direction = random.choice(['left','right'])
+            move = random.choice(['left','right'])
 
-    return move_response(direction)
+    elif y[0] == 7:
+        if (x[0] != x[1]):
+            move = 'up'
+        else:
+            move = random.choice(['left','right'])
+
+    elif (y[0]==y[1]):
+        if x[0] == x[len(x)-1]+1 or x[0] == x[len(x)-1]-1:
+            if y[(len(x)-1)//2] > y[0]:
+                move = 'up'
+        
+
+    return move_response(move)
 
 
 @bottle.post('/end')
